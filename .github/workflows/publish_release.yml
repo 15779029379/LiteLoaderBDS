@@ -1,21 +1,20 @@
 name: "Publish Release"
 
 on:
-  workflow_dispatch:
-    inputs:
-      tag:
-        required: true
-        description: 'release tag'
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
 
 env:
   BUILD_TYPE: Release
 
 jobs:
   build:
-    runs-on: windows-2022
+    runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3.0.2
+      - uses: actions/checkout@v3.2.0
         with:
           fetch-depth: 1
           submodules: 'true'
@@ -23,8 +22,6 @@ jobs:
       - name: Create tag
         working-directory: ${{ env.GITHUB_WORKSPACE }}
         run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git tag | xargs git tag -d
           git tag ${{ github.event.inputs.tag }}
           git push origin ${{ github.event.inputs.tag }}
@@ -113,8 +110,6 @@ jobs:
       - name: Update LiteLoaderSDK
         working-directory: ${{ env.GITHUB_WORKSPACE }}
         run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
           cd scripts
           ./UploadSDK.cmd action release
         env:
